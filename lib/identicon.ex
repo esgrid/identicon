@@ -14,11 +14,20 @@ defmodule Identicon do
   end
 
   def mirror_rows(list_triples) do
+    # for triplet <- list_triples do
+    #   [a, b | _ ] = triplet
+    #   [ triplet | [b, a]]
+    #   |> List.flatten
+    # end
+    # instructor's solution is to do:
+    # triplet ++ [b, a] rather than what I did [triplet | [b, a]] and then flatten
+    # I will adopt his solution since it is shorter.
     for triplet <- list_triples do
-      [a, b | _ ] = triplet
-      [ triplet | [b, a]]
-      |> List.flatten
+      [first, second | _ ] = triplet
+      triplet ++ [second, first]
     end
+    # Also, he uses map, instead of for, so I will do that as well, since it is simpler
+    # Enum.map(list_triples, (triplet -> triplet))
   end
 
   def build_grid(%Identicon.Image{hex: hex} = _image) do
