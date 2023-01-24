@@ -13,14 +13,14 @@ defmodule Identicon do
   end
 
   @doc """
-    `pick_colour` function receives image and r, g, b and returns a new struct containg image and a tuple: {r, g, b}
+    `pick_colour` function receives `image` and `r`, `g`, `b` and returns a new struct containg image and a tuple: `{r, g, b}`
   """
   def pick_colour(%Identicon.Image{hex: [r, g, b | _]} = image) do
     %Identicon.Image{image | colour: {r, g, b}}
   end
 
   @doc """
-    This is the hashing function. It calls `%Identicon.Image{hex: }` sending `hex` to the struct.
+    This is the hashing function. It calls `%Identicon.Image{hex: hex}` sending `hex` to the struct.
   """
   def hash_input(input) do
     hex = :crypto.hash(:md5, input)
