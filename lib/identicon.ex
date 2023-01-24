@@ -10,6 +10,21 @@ defmodule Identicon do
     input
     |> hash_input
     |> pick_colour
+    |> build_grid
+  end
+
+  def mirror_rows(list_triples) do
+    for triplet <- list_triples do
+      [a, b | _ ] = triplet
+      [ triplet | [b, a]]
+      |> List.flatten
+    end
+    # |> List.flatten
+  end
+
+  def build_grid(%Identicon.Image{hex: hex} = image) do
+    Enum.chunk_every(hex, 3, 3, :discard)
+    |> mirror_rows
   end
 
   @doc """
