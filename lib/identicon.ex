@@ -19,11 +19,11 @@ defmodule Identicon do
       [ triplet | [b, a]]
       |> List.flatten
     end
-    # |> List.flatten
   end
 
-  def build_grid(%Identicon.Image{hex: hex} = image) do
-    Enum.chunk_every(hex, 3, 3, :discard)
+  def build_grid(%Identicon.Image{hex: hex} = _image) do
+    hex
+    |> Enum.chunk_every(3, 3, :discard)
     |> mirror_rows
   end
 
