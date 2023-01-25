@@ -11,29 +11,64 @@ defmodule Identicon do
     |> hash_input
     |> pick_colour
     |> build_grid
+    |> filter_odd_squares
+    |> build_pixel_map
+    |> draw_image
+    |> save_image(input)
   end
 
-  def mirror_rows(list_triples) do
-    # for triplet <- list_triples do
-    #   [a, b | _ ] = triplet
-    #   [ triplet | [b, a]]
-    #   |> List.flatten
-    # end
-    # instructor's solution is to do:
-    # triplet ++ [b, a] rather than what I did [triplet | [b, a]] and then flatten
-    # I will adopt his solution since it is shorter.
-    for triplet <- list_triples do
-      [first, second | _ ] = triplet
-      triplet ++ [second, first]
+  def save_image(image, input) do
+    File.write("#{input}.png", image)
+  end
+
+  def draw_image(%Identicon.Image{colour: colour, pixel_map: pixel_map}) do
+    image = :egd.create(250, 250)
+    fill = :egd.color(colour)
+
+    Enum.each pixel_map, fn {start, stop} ->
+      :egd.filledRectangle(image, start, stop, fill)
     end
-    # Also, he uses map, instead of for, so I will do that as well, since it is simpler
-    # Enum.map(list_triples, (triplet -> triplet))
+
+    :egd.render(image)
   end
 
-  def build_grid(%Identicon.Image{hex: hex} = _image) do
-    hex
-    |> Enum.chunk_every(3, 3, :discard)
-    |> mirror_rows
+  def build_pixel_map(%Identicon.Image{grid: grid} = image) do
+    pixel_map = Enum.map grid, fn {_, index} ->
+      horizontal = rem(index, 5) * 50
+      vertical = div(index, 5) * 50
+
+      top_left = {horizontal, vertical}
+      bottom_right = {horizontal + 50, vertical + 50}
+
+      {top_left, bottom_right}
+    end
+
+    %Identicon.Image{image | pixel_map: pixel_map}
+  end
+
+  def filter_odd_squares(%Identicon.Image{grid: grid} = image) do
+    new_grid = Enum.filter grid, fn {element, _} ->
+      Integer.mod(element, 2) == 0
+    end
+
+    %Identicon.Image{image | grid: new_grid}
+  end
+
+  def make_row(triplet) do
+    [first, second | _] = triplet
+
+    triplet ++ [second, first]
+  end
+
+  def build_grid(%Identicon.Image{hex: hex} = image) do
+    grid =
+      hex
+      |> Enum.chunk_every(3, 3, :discard)
+      |> Enum.map(&make_row/1)
+      |> List.flatten
+      |> Enum.with_index
+
+    %Identicon.Image{image | grid: grid}
   end
 
   @doc """
