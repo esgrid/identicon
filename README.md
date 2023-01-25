@@ -17,7 +17,7 @@ mix deps.get
 iex -S mix
 ```
 
-## To Generate Identicon
+### To Generate Identicon
 ```
 iex> Identicon.main("avatar")
 ```
